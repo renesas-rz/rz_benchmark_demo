@@ -102,212 +102,79 @@
 #			When the type is "dropdown", the value shall be
 #			contained in 'values_list'.
 
-version = "v1.00.000"
+version = "v1.00.001"
 log_path = "/home/root"
 
 [[benchmarks]]
-	name = "dd"
-	summary = "Write speed of SD card"
-	path = "dd"
+	name = "sysbench"
+	summary = "CPU performance"
+	path = "sysbench"
 	features = """\
-		\n The dd command copies a file, and it can be used \
-		for measuring I/O performance of SD card. In this test, \
-		dd command read from /dev/zero and write to a file in \
-		the SD card.\
+		\n Sysbench is a benchmark tool. It supports the following \
+		benchmarks: \
+		\n - a filesystem-level benchmark \
+		\n - a simple CPU benchmark \
+		\n - a memory access benchmark \
+		\n - a thread-based scheduler benchmark \
+		\n - a POSIX mutex benchmark \
 		\n\n The measurement time depends on the specified options."""
-	time = "1 minute"
-	peripheral = [ "SD card" ]
-	# filter = ""
+	time = "10 seconds"
+	# peripheral = []
+	# filter = " "
 
 	[[benchmarks.options]]
-		name = "if"
-		option_str = "if="
+		name = "test to run"
+		option_str = "--test="
 		use = true
 		type = "label"
-		option_text = "inpuf file"
+		# option_text = ""
 		# values_list = []
-		current_value = "/dev/zero"
+		current_value = "cpu"
 
 	[[benchmarks.options]]
-		name = "of"
-		option_str = "of="
+		name = "the number of worker"
+		option_str = "--num-threads="
 		use = true
 		type = "label"
-		option_text = "output file"
+		# option_text = ""
 		# values_list = []
-		current_value = "/home/root/test_file"
+		current_value = "2"
 
 	[[benchmarks.options]]
-		name = "bs"
-		option_str = "bs="
+		name = "limit of total number of requests"
+		option_str = "--max-requests="
 		use = true
 		type = "label"
-		option_text = "read/write size (bytes) at a time"
+		# option_text = ""
 		# values_list = []
-		current_value = "512M"
+		current_value = "10000"
 
 	[[benchmarks.options]]
-		name = "count"
-		option_str = "count="
+		name = "limit of total execution time in seconds"
+		option_str = "--max-time="
 		use = true
 		type = "label"
-		option_text = "the number of blocks to be read/written"
+		# option_text = ""
 		# values_list = []
-		current_value = "1"
+		current_value = "10"
 
 	[[benchmarks.options]]
-		name = "oflag"
-		option_str = "oflag="
-		use = true
-		type = "dropdown"
-		option_text = "Access the output file using specified values_list"
-		values_list = [ "direct", "dsync" ]
-		current_value = "direct"
-
-[[benchmarks]]
-	name = "dd"
-	summary = "Read speed of SD card"
-	path = "dd"
-	features = """\
-		\n The dd command copies a file, and it can be used for \
-		measuring I/O performance of SD card. In this test, \
-		dd command reads from a file in the SD card and writes to \
-		/dev/null. Before running this test, run a test for \
-		write speed of SD card. The file read in this test is created \
-		by the test for write speed of SD card.\
-		\n\n The measurement time depends on the specified options."""
-	time = "30 seconds"
-	peripheral = [ "SD card" ]
-	# filter = ""
-
-	[[benchmarks.options]]
-		name = "if"
-		option_str = "if="
+		name = "upper limit of primes generator"
+		option_str = "--cpu-max-prime="
 		use = true
 		type = "label"
-		option_text = "inpuf file"
+		# option_text = ""
 		# values_list = []
-		current_value = "/home/root/test_file"
+		current_value = "100000"
 
 	[[benchmarks.options]]
-		name = "of"
-		option_str = "of="
+		name = "command"
+		# option_str = ""
 		use = true
 		type = "label"
-		option_text = "output file"
+		# option_text = ""
 		# values_list = []
-		current_value = "/dev/null"
-
-	[[benchmarks.options]]
-		name = "iflag"
-		option_str = "iflag="
-		use = true
-		type = "dropdown"
-		option_text = "Access the input file using specified values_list"
-		values_list = [ "direct", "dsync" ]
-		current_value = "dsync"
-
-[[benchmarks]]
-	name = "dd"
-	summary = "Write speed of USB flash drive"
-	path = "dd"
-	features = """\
-		\n The dd command copies a file, and it can be used for \
-		measuring I/O performance of USB flash drive. In this test, \
-		dd command read from /dev/zero and write to a file in \
-		the USB flash drive.\
-		\n\n The measurement time depends on the specified options."""
-	time = "1 minute"
-	peripheral = [ "USB flash" ]
-	# filter = ""
-
-	[[benchmarks.options]]
-		name = "if"
-		option_str = "if="
-		use = true
-		type = "label"
-		option_text = "inpuf file"
-		# values_list = []
-		current_value = "/dev/zero"
-
-	[[benchmarks.options]]
-		name = "of"
-		option_str = "of="
-		use = true
-		type = "label"
-		option_text = "output file"
-		# values_list = []
-		current_value = "/mnt/usb_flash/test_file"
-
-	[[benchmarks.options]]
-		name = "bs"
-		option_str = "bs="
-		use = true
-		type = "label"
-		option_text = "read/write size (bytes) at a time"
-		# values_list = []
-		current_value = "512M"
-
-	[[benchmarks.options]]
-		name = "count"
-		option_str = "count="
-		use = true
-		type = "label"
-		option_text = "the number of blocks to be read/written"
-		# values_list = []
-		current_value = "1"
-
-	[[benchmarks.options]]
-		name = "oflag"
-		option_str = "oflag="
-		use = true
-		type = "dropdown"
-		option_text = "Access the output file using specified values_list"
-		values_list = [ "direct", "dsync" ]
-		current_value = "direct"
-
-[[benchmarks]]
-	name = "dd"
-	summary = "Read speed of USB flash drive"
-	path = "dd"
-	features = """\
-		\n The dd command copies a file, and it can be used for \
-		measuring I/O performance of USB flash drive. In this test, \
-		dd command reads from a file in the USB flash drive and \
-		writes to /dev/null. Before running this test, run a test for \
-		write speed of USB flash drive. The file read in this test is \
-		created by the test for write speed of USB flash drive.\
-		\n\n The measurement time depends on the specified options."""
-	time = "30 seconds"
-	peripheral = [ "USB flash" ]
-	# filter = ""
-
-	[[benchmarks.options]]
-		name = "if"
-		option_str = "if="
-		use = true
-		type = "label"
-		option_text = "inpuf file"
-		# values_list = []
-		current_value = "/mnt/usb_flash/test_file"
-
-	[[benchmarks.options]]
-		name = "of"
-		option_str = "of="
-		use = true
-		type = "label"
-		option_text = "output file"
-		# values_list = []
-		current_value = "/dev/null"
-
-	[[benchmarks.options]]
-		name = "iflag"
-		option_str = "iflag="
-		use = true
-		type = "dropdown"
-		option_text = "Access the input file using specified values_list"
-		values_list = [ "direct", "dsync" ]
-		current_value = "dsync"
+		current_value = "run"
 
 [[benchmarks]]
 	name = "sysbench"
@@ -372,57 +239,6 @@ log_path = "/home/root"
 		current_value = "run"
 
 [[benchmarks]]
-	name = "iperf3"
-	summary = "network bandwidth"
-	path = "iperf3"
-	features = """\
-		\n The iperf3 is a tool used for measuring the maximum \
-		achievable bandwidth on IP network. In this test, iperf3 \
-		measures performance between the evaluation board and \
-		PC connected to the board. Before running this test, \
-		run iperf3 on the PC as follows:\
-		\n  $ iperf3 -s"""
-	time = "10 seconds"
-	peripheral = [ "Ethernet" ]
-	filter = "less rz_bench_XXXXXX | grep -e sender -e receiver"
-
-	[[benchmarks.options]]
-		name = "client"
-		option_str = "-c"
-		use = true
-		type = "ipaddress"
-		# option_text = ""
-		# values_list = []
-		current_value = "192.168.20.1"
-
-	[[benchmarks.options]]
-		name = "reverse mode"
-		option_str = "-R"
-		use = false
-		type = "none"
-		# option_text = ""
-		# values_list = []
-		# current_value = ""
-
-	[[benchmarks.options]]
-		name = "target bitrate"
-		option_str = "-b"
-		use = true
-		type = "numerickey"
-		# option_text = ""
-		# values_list = []
-		current_value = "0"
-
-	[[benchmarks.options]]
-		name = "UDP"
-		option_str = "-u"
-		use = false
-		type = "none"
-		# option_text = ""
-		# values_list = []
-		# current_value = ""
-
-[[benchmarks]]
 	name = "coremark"
 	summary = "CPU performance"
 	path = "coremark"
@@ -476,7 +292,7 @@ log_path = "/home/root"
 [[benchmarks]]
 	name = "GStreamer"
 	summary = "Video decode script"
-	path = "/home/root/video-dec.sh"
+	path = "/usr/share/benchmark_demo/video-dec.sh"
 	features = """\
 		\n This test measures the performance of video decode \
 		using GStreamer (gst-launch-1.0). The gst-launch-1.0 is \
@@ -489,19 +305,19 @@ log_path = "/home/root"
 		www.bigbuckbunny.org \
 		\n\n For detailed information, \
 		see https://peach.blender.org/about/."""
-	time = "1 minute"
+	time = "30 seconds"
 	# peripheral = []
 	# filter = ""
 
 [[benchmarks]]
 	name = "GStreamer"
 	summary = "Video encode script"
-	path = "/home/root/video-enc.sh"
+	path = "/usr/share/benchmark_demo/video-enc.sh"
 	features = """\
 		\n This test measures the performance of video encode \
 		using GStreamer (gst-launch-1.0). The gst-launch-1.0 is \
 		executed in a shell script 'video-enc.sh'."""
-	time = "20 seconds"
+	time = "30 seconds"
 	# peripheral = []
 	# filter = ""
 
@@ -515,6 +331,15 @@ log_path = "/home/root"
 	time = "6 minutes"
 	# peripheral = []
 	# filter = ""
+
+	[[benchmarks.options]]
+		name = "off screen rendering"
+		option_str = "--off-screen"
+		use = true
+		type = "none"
+		# option_text = ""
+		# values_list = []
+		# current_value = ""
 
 	[[benchmarks.options]]
 		name = "fullscreen mode"
