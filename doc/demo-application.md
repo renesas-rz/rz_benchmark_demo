@@ -41,7 +41,7 @@ And this demo program uses a font in the "FiraCode" family.
 	* [RZ/G2L Evaluation Board Kit](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-mpus/rzg2l-evkit-rzg2l-evaluation-board-kit)
 
 * Supported Environment
-	* [RZ/G Verified Linux Package for RZ/G2L v3.0.5](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-mpus/rzg-linux-platform/rzg-marketplace/verified-linux-package/rzg-verified-linux-package#Download)
+	* [RZ/G Verified Linux Package for RZ/G2L](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-mpus/rzg-linux-platform/rzg-marketplace/verified-linux-package/rzg-verified-linux-package#Download)
 
 
 ## Build Instructions

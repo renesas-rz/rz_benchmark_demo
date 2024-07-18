@@ -2,14 +2,15 @@
 
 To build the RZ Linux Benchmark Demo, use a PC with Ubuntu 20.04 LTS.
 
-Currently, RZ Linux Benchmark Demo is built based on RZ/G Verified Linux Package (hereinafter referred to as the "VLP") v3.0.5.
+Currently, RZ Linux Benchmark Demo is built based on RZ/G Verified Linux Package (hereinafter referred to as the "VLP") v3.0.6.
 You can get the VLP/G from the following links:
-* [RZ/G Verified Linux Package v3.0.5-update3](https://www.renesas.com/us/en/document/swo/rzg-verified-linux-package-v305-update3rtk0ef0045z0021azj-v305-update3zip?r=1597481)
-* [RZ MPU Graphics Library Evaluation Version for RZ/G2L and RZ/G2LC v1.1.2](https://www.renesas.com/us/en/document/swo/rz-mpu-graphics-library-evaluation-version-rzg2l-and-rzg2lc-rtk0ef0045z13001zj-v112enzip?language=en&r=1522761)
-* [RZ MPU Video Codec Library Evaluation Version for RZ/G2L v1.1.0](https://www.renesas.com/us/en/document/swo/rz-mpu-video-codec-library-evaluation-version-rzg2l-rtk0ef0045z15001zj-v110xxzip?language=en&r=1535641)
+* [RZ/G Verified Linux Package v3.0.6-update2](https://www.renesas.com/us/en/document/swo/rzg-verified-linux-package-v306-update2rtk0ef0045z0021azj-v306-update2zip?r=1597481)
+* [RZ MPU Graphics Library Evaluation Version for RZ/G2L and RZ/G2LC v1.2.2](https://www.renesas.com/us/en/document/swo/rz-mpu-graphics-library-evaluation-version-v122-rzg2l-and-rzg2lc-rtk0ef0045z13001zj-v122xxzip?r=1522761)
+* [RZ MPU Video Codec Library Evaluation Version for RZ/G2L v1.2.1](https://www.renesas.com/us/en/document/swo/rz-mpu-video-codec-library-evaluation-version-v121-rzg2l-rtk0ef0045z15001zj-v121xxzip?r=1535641)
 
 The build instructions below are almost the same as instructions in "Linux Start-up Guide" of the VLP.
 For more detailed information about the instructions, see "Linux Start-up Guide".
+Please note that file names and directory names in the following instructions may have a version number in them. They shall be read as actual names.
 
 ---
 
@@ -73,7 +74,7 @@ Add meta-rz-graphics layer for graphics and meta-rz-codecs layer for video codec
 	```
 
 6. Apply a patch  
-Apply a patch when you use VLP v3.0.5-update3.
+Apply a patch if it is available in the VLP.
 	```bash
 	$ cd $WORK/
 	$ patch -p1 < ${VLP_DIR}/RTK0EF0045Z0021AZJ-v3.0.5-update3/v3.0.5-to-v3.0.5update3.patch
