@@ -1,0 +1,291 @@
+# For information about specification of TOML, refer to the following URL:
+#   https://github.com/toml-lang/toml.io/blob/main/specs/en/v1.0.0.md
+
+# All <REQUIRED> keys shall be defined , and <OPTIONAL> keys can be skipped.
+#
+# * version - <REQUIRED>, 9~15 characters
+#	Set version number of benchmark demo.
+#	It takes the form "MAJOR.MINOR.MAINTENANCE". User can change
+#	the MAINTENANCE version to manage configuration file.
+#
+# * log_path - <REQUIRED>, 1~3968 characters
+#	Set location where benchmark result files are stored.
+#
+# [[benchmarks]] - <REQUIRED>
+#	This key shall be set to each benchmark tool respectively.
+#
+#	* name - <REQUIRED>, 1~79 characters
+#		Set the name of the benchmark tool.
+#
+#	* summary - <OPTIONAL>, 1~79 characters
+#		Set a simple explanation the benchmark tool.
+#
+#	* path - <REQUIRED>, 1~4095 characters
+#		If the tool is installed in /usr/bin or /bin that are specified
+#		in PATH variable, full path is not necessary.
+#
+#	* features - <OPTIONAL>, 1~1600 characters
+#		Set text that describes features of the benchmark tool.
+#
+#	* time - <OPTIONAL>, 1~79 characters
+#		Set expected execution time of the benchmark tool.
+#
+#	* peripheral - <OPTIONAL>, "SD card"/"USB flash"/"eMMC"/"Ethernet"
+#		Set peripherals that the benchmark tool needs.
+#		Above 4 peripherals are supported.
+#		E.g.,
+#			peripheral = ["eMMC"]
+#			peripheral = ["SD card", "Ethernet"]
+#
+#	* filter - <OPTIONAL>, 1~1600 characters
+#		Set filtering commands for the benchmark result.
+#		When the benchmark tool outputs a lot of messages, user can
+#		pick up only important messages using filter commands.
+#		It can be considered that the result of the benchmark tools is
+#		output to 'rz_bench_XXXXXX'.
+#		E.g.,
+#			filter = "less rz_bench_XXXXXX | sed -e s/weston-//g"
+#			filter = "less rz_bench_XXXXXX | grep -e sender -e receiver"
+#
+#	[[benchmarks.options]] - <OPTIONAL>
+#		This key is set to each option of the benchmark tool
+#		respectively. If the tool does not have any options,
+#		this can be skipped.
+#
+#		* name - <REQUIRED>, 1~79 characters
+#			Set the name of the benchmark tool option.
+#
+#		* option_str - <OPTIONAL>, 1~79 characters
+#			Set a option string that includes hyphen, equal sign,
+#			and so on.
+#			When the parameter is set without option string, this
+#			key can be skipped.
+#
+#		* use - <REQUIRED>, true/false
+#			Set true or false.
+#			When true is set, the option is enabled by default.
+#
+#		* type - <REQUIRED>, "none"/"label"/"dropdown"/
+#						"numerickey"/"ipaddress"
+#			Set an option type.
+#			- "none"
+#				The option does not take a value.
+#			- "label"
+#				The option takes a static value with/without
+#				an option string.
+#			- "dropdown"
+#				The option takes a value with/without an option
+#				string.
+#				User can change/select the value through
+#				a dropdown list on the benchmark demo GUI.
+#			- "numerickey"
+#				The option takes a number as a value.
+#				User can change the number through
+#				the benchmark demo GUI.
+#			- "ipaddress"
+#				The option takes an IP address as a value.
+#				User can change the address through
+#				the benchmark demo GUI.
+#
+#		* option_text - <OPTIONAL>, 1~320 characters
+#			Set text that describes the option.
+#
+#		* values_list - <(REQUIRED)>, 1~79 characters, 16 items
+#			Set values contained in the dropdown list.
+#			This key is REQUIRED only when the type is "dropdown".
+#			E.g.,
+#				values_list = [ "direct", "dsync" ]
+#
+#		* current_value - <(REQUIRED)>, 1~79 characters
+#			Set the current value.
+#			This key is REQUIRED when the type is NOT "none".
+#			When the type is "dropdown", the value shall be
+#			contained in 'values_list'.
+
+version = "v1.00.001"
+log_path = "/home/root"
+
+[[benchmarks]]
+	name = "sysbench"
+	summary = "CPU performance"
+	path = "sysbench"
+	features = """\
+		\n Sysbench is a benchmark tool. It supports the following \
+		benchmarks: \
+		\n - a filesystem-level benchmark \
+		\n - a simple CPU benchmark \
+		\n - a memory access benchmark \
+		\n - a thread-based scheduler benchmark \
+		\n - a POSIX mutex benchmark \
+		\n\n The measurement time depends on the specified options."""
+	time = "10 seconds"
+	# peripheral = []
+	# filter = " "
+
+	[[benchmarks.options]]
+		name = "test to run"
+		option_str = "--test="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "cpu"
+
+	[[benchmarks.options]]
+		name = "the number of worker"
+		option_str = "--num-threads="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "2"
+
+	[[benchmarks.options]]
+		name = "limit of total number of requests"
+		option_str = "--max-requests="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "10000"
+
+	[[benchmarks.options]]
+		name = "limit of total execution time in seconds"
+		option_str = "--max-time="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "10"
+
+	[[benchmarks.options]]
+		name = "upper limit of primes generator"
+		option_str = "--cpu-max-prime="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "100000"
+
+	[[benchmarks.options]]
+		name = "command"
+		# option_str = ""
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "run"
+
+[[benchmarks]]
+	name = "sysbench"
+	summary = "memory access speed test"
+	path = "sysbench"
+	features = """\
+		\n Sysbench is a benchmark tool. It supports the following \
+		benchmarks: \
+		\n - a filesystem-level benchmark \
+		\n - a simple CPU benchmark \
+		\n - a memory access benchmark \
+		\n - a thread-based scheduler benchmark \
+		\n - a POSIX mutex benchmark \
+		\n\n The measurement time depends on the specified options."""
+	time = "1 minute"
+	# peripheral = []
+	# filter = " "
+
+	[[benchmarks.options]]
+		name = "test to run"
+		option_str = "--test="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "memory"
+
+	[[benchmarks.options]]
+		name = "size of memory block"
+		option_str = "--memory-block-size="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "1M"
+
+	[[benchmarks.options]]
+		name = "total size of data"
+		option_str = "--memory-total-size="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "100G"
+
+	[[benchmarks.options]]
+		name = "the number of worker"
+		option_str = "--num-threads="
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "1"
+
+	[[benchmarks.options]]
+		name = "command"
+		# option_str = ""
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "run"
+
+[[benchmarks]]
+	name = "coremark"
+	summary = "CPU performance"
+	path = "coremark"
+	features = """\
+		\n The coremark is a benchmark that measures CPU performance. \
+		\n For detailed information, check the following website: \
+		\nhttps://www.eembc.org/coremark/"""
+	time = "20 seconds"
+	# peripheral = []
+	# filter = ""
+
+[[benchmarks]]
+	name = "stress-ng"
+	summary = "password encryption"
+	path = "stress-ng"
+	features = """\
+		\n The stress-ng (stress next generation) stresses system and \
+		measures test throughput rates.\
+		\n\n The measurement time depends on the specified options."""
+	time = "30 seconds"
+	# peripheral = []
+	# filter = ""
+
+	[[benchmarks.options]]
+		name = "password encryption"
+		option_str = "--crypt"
+		use = true
+		type = "numerickey"
+		option_text = "the number of workers performing password encryption"
+		# values_list = []
+		current_value = "0"
+
+	[[benchmarks.options]]
+		name = "tiemout"
+		option_str = "-t"
+		use = true
+		type = "label"
+		# option_text = ""
+		# values_list = []
+		current_value = "30s"
+
+	[[benchmarks.options]]
+		name = "metrics"
+		option_str = "--metrics-brief"
+		use = true
+		type = "none"
+		# option_text = ""
+		# values_list = []
+		# current_value = ""
+
