@@ -428,7 +428,7 @@ typedef struct {
  * Declarations and definition for GUI demo
  *****************************************************************************/
 #define	LB_MAJOR_VERSION		(1)	/* Major number 0 ~ 9999999 */
-#define	LB_MINOR_VERSION		(0)	/* Minor number 0 ~ 99 */
+#define	LB_MINOR_VERSION		(1)	/* Minor number 0 ~ 99 */
 
 #if LB_MAJOR_VERSION > 9999999
 	#error	"LB_MAJOR_VERSION is too big."
