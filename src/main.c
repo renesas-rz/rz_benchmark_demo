@@ -25,12 +25,28 @@
 #include	"include/benchmark_demo_gui.h"
 #include        "include/benchmark_demo_platform.h"
 
-static int32_t check_options(int argc, char *argv[], char **cfg)
+static void show_usage(void)
+{
+	printf("Usage: rz_benchmark_demo [OPTION]\n\n"
+		"Options are:\n"
+		"\t-c, --config\tspecify configuration file\n"
+		"\t\t\tUnless specified, %s is used\n"
+		"\t-i, --input\tset input evdev device\n"
+		"\t\t\tUnless specified, device set to EVDEV_NAME "
+			"in lv_drv_conf.h is used.\n"
+		"\t\t\tThis option is ineffective when rz_benchmark_demo "
+			"runs on weston.\n"
+		"\t-v, --version\toutput version information and exit\n"
+		"\t-h, --help"
+		"\tdisplay this help message and exit\n",
+		LB_DEFAULT_CFGFILE);
+}
+
+static void check_options(int argc, char *argv[], char **cfg, char **input)
 {
 	int option;
 	int index;
-	int32_t ret = 0;
-	const char *optstring = "c:vh";
+	const char *optstring = "c:i:vh";
 	const struct option longopts[] = {
 		{"config", required_argument, NULL, 'c'},
 		{"version", no_argument, NULL, 'v'},
@@ -47,88 +63,193 @@ static int32_t check_options(int argc, char *argv[], char **cfg)
 			if (cfg != NULL)
 				*cfg = optarg;
 			break;
+		case 'i':
+			if (input != NULL)
+				*input = optarg;
+			break;
 		case 'v':
 			printf("RZ Linux Benchmark Demo, "
 				"Ver. %d.%02d\n" \
 				"Copyright (C) 2024 Renesas Electronics Corp. "
 				"All rights reserved.\n",
 				LB_MAJOR_VERSION, LB_MINOR_VERSION);
-			ret = 1;
+			exit(EXIT_SUCCESS);
 			break;
 		case 'h':
-			printf("Usage: rz_benchmark_demo [OPTION]\n\n"
-				"Options are:\n"
-				"\t-c, --config\tspecify configuration file\n"
-				"\t\t\tunless specified, %s is used\n"
-				"\t-v, --version"
-				"\toutput version information and exit\n"
-				"\t-h, --help"
-				"\tdisplay this help message and exit\n",
-				LB_DEFAULT_CFGFILE);
-			ret = 1;
+			show_usage();
+			exit(EXIT_SUCCESS);
 			break;
 		default:
-			ret = -1;
+			show_usage();
+			exit(EXIT_FAILURE);
 			break;
 		}
 	}
-	return ret;
+	return;
 }
+
+#ifndef RUNS_ON_WAYLAND	/* Runs with FBDEV and EVDEV */
+
+/**
+ * Create fbdev window with evdev
+ */
+static lb_disp_fbevdev_t *create_fbdev_window(char *inputdev)
+{
+	uint32_t width, height;
+	lb_disp_fbevdev_t *dispinf;
+	lv_disp_drv_t *disp_drv;
+	lv_obj_t *cursor_obj;
+	bool ret;
+
+	/* Init Linux frame buffer device for LVGL */
+	fbdev_init();
+	fbdev_get_sizes(&width, &height, NULL);
+
+	dispinf = lv_mem_alloc(sizeof (lb_disp_fbevdev_t));
+	if (!dispinf) {
+		printf("ERROR!! memory allocation failed at lv_mem_alloc()\n");
+		return NULL;
+	}
+
+	dispinf->buff = lv_mem_alloc(width * height * sizeof(lv_color_t));
+	if (!dispinf->buff) {
+		printf("ERROR!! memory allocation failed at lv_mem_alloc()\n");
+		lv_mem_free(dispinf);
+		return NULL;
+	}
+	lv_disp_draw_buf_init(&dispinf->draw_buf, dispinf->buff, NULL,
+							width * height);
+
+	disp_drv = &dispinf->drv;
+	/* Initialize and register a display driver */
+	lv_disp_drv_init(disp_drv);
+
+	disp_drv->draw_buf		= &dispinf->draw_buf;
+	disp_drv->flush_cb		= fbdev_flush;
+	disp_drv->hor_res		= (lv_coord_t)width;
+	disp_drv->ver_res		= (lv_coord_t)height;
+	disp_drv->physical_hor_res	= (lv_coord_t)width;
+	disp_drv->physical_ver_res	= (lv_coord_t)height;
+
+	dispinf->disp = lv_disp_drv_register(disp_drv);
+
+	dispinf->width = (lv_coord_t)width;
+	dispinf->height = (lv_coord_t)height;
+
+	/* Init evdev for LVGL */
+	evdev_init();
+
+	if (inputdev) {
+		ret = evdev_set_file(inputdev);
+		if (!ret) {
+			printf("ERROR!! the specified device file does not exist\n");
+		}
+	}
+
+	lv_indev_drv_init(&dispinf->indev_drv);
+
+	dispinf->indev_drv.type = LV_INDEV_TYPE_POINTER;
+	/* This function will be called periodically (by the library)
+	   to get the mouse position and state */
+	dispinf->indev_drv.read_cb = evdev_read;
+
+	dispinf->mouse_indev = lv_indev_drv_register(&dispinf->indev_drv);
+
+	/* Set a cursor for the mouse */
+	LV_IMG_DECLARE(mouse_cursor);
+	/* Create an image object for the cursor */
+	cursor_obj = lv_img_create(lv_scr_act());
+	lv_img_set_src(cursor_obj, &mouse_cursor);
+	/* Connect the image  object to the driver */
+	lv_indev_set_cursor(dispinf->mouse_indev, cursor_obj);
+
+	return dispinf;
+}
+
+static void close_fbdev_window(lb_disp_fbevdev_t *dispinf)
+{
+	if (!dispinf) {
+		printf("ERROR!! no object to be freed.\n");
+		return;
+	}
+
+	if (dispinf->mouse_indev)
+		lv_indev_delete(dispinf->mouse_indev);
+
+	if (dispinf->disp)
+		lv_disp_remove(dispinf->disp);
+
+	if (dispinf->buff)
+		lv_mem_free(dispinf->buff);
+
+	lv_mem_free(dispinf);
+
+	fbdev_exit();
+}
+#endif
 
 int main(int argc, char *argv[])
 {
+#ifdef RUNS_ON_WAYLAND
 	struct pollfd pfd;
 	uint32_t time_till_next;
 	int sleep;
+	lv_disp_t * disp;
+#else /* FBDEV and EVDEV  */
+	lb_disp_fbevdev_t *disp;
+#endif
 	int32_t width, height;
 	int32_t ret;
 	char *cfg_path = LB_DEFAULT_CFGFILE;
-	lb_gui_shutdown_type_t shutdown_type;
+	lb_gui_shutdown_type_t shutdown_type = GUI_SHUTDOWN_TYPE_QUIT;
 	int ret_val = 0;
+	char *inputdev = NULL;
 
-	ret = check_options(argc, argv, &cfg_path);
-	if (ret < 0) {
-		return 1;
-	}
-	else if (ret > 0) {
-		return 0;
-	}
+	check_options(argc, argv, &cfg_path, &inputdev);
 
-	/*LittlevGL init*/
+	/* LittlevGL init */
 	lv_init();
 
+#ifdef RUNS_ON_WAYLAND
 	lv_wayland_init();
 
 	ret = lb_demo_platform_get_resolution(&width, &height);
 	if (ret < 0) {
 		printf("ERROR!! lb_demo_platform_get_resolution() failed.\n");
-		lv_wayland_deinit();
-		return 1;
+		goto APP_EXIT;
 	}
 
-	lv_disp_t * disp = lv_wayland_create_window((lv_coord_t)width,
-						    (lv_coord_t)height,
-						    "Window Demo", NULL);
+	disp = lv_wayland_create_window((lv_coord_t)width, (lv_coord_t)height,
+							"Window Demo", NULL);
 	if (disp == NULL) {
 		printf("ERROR!! lv_wayland_create_window\n");
-		lv_wayland_deinit();
-		return 1;
+		goto APP_EXIT;
 	}
-
 
 	lv_wayland_window_set_fullscreen(disp, true);
 
 	pfd.fd = lv_wayland_get_fd();
 	pfd.events = POLLIN;
 
-	ret = lb_demo_gui(width, height, disp, cfg_path);
+#else /* FBDEV and EVDEV  */
+	disp = create_fbdev_window(inputdev);
+	if (disp == NULL) {
+		printf("ERROR!! create_fbdev_window\n");
+		goto APP_EXIT;
+	}
+	/* Clear end flag */
+	disp->end = false;
+	width = disp->width;
+	height = disp->height;
+#endif
+	ret = lb_demo_gui(width, height, (void *)disp, cfg_path);
 	if (ret < 0) {
 		printf("ERROR!! lb_demo_gui() failed.\n");
-		lv_wayland_deinit();
-		return 1;
+		goto APP_EXIT;
 	}
 
 	while(1) {
+#ifdef RUNS_ON_WAYLAND
 		/* Handle any Wayland/LVGL timers/events */
 		time_till_next = lv_wayland_timer_handler();
 
@@ -146,12 +267,24 @@ int main(int argc, char *argv[])
 			sleep = time_till_next;
 		}
 		while ((poll(&pfd, 1, sleep) < 0) && (errno == EINTR));
+#else /* FBDEV and EVDEV  */
+		lv_timer_handler();
+		usleep(5000);
+		if (disp->end)
+			break;
+#endif
 	}
 	shutdown_type = lb_demo_get_shutdown_type();
 
 	lb_demo_quit();
+APP_EXIT:
 
+#ifdef RUNS_ON_WAYLAND
 	lv_wayland_deinit();
+
+#else /* FBDEV and EVDEV  */
+	close_fbdev_window(disp);
+#endif
 
 	if (shutdown_type == GUI_SHUTDOWN_TYPE_POWEROFF) {
 		ret_val = system("shutdown -h now");

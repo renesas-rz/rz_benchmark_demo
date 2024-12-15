@@ -12,7 +12,22 @@
 
 
 #include	"lvgl/lvgl.h"
+#include	"lvgl/lv_drivers/lv_drv_conf.h"
+
+#if	USE_FBDEV && USE_EVDEV
+  #undef	RUNS_ON_WAYLAND
+#elif	USE_WAYLAND
+  #define	RUNS_ON_WAYLAND
+#else
+  #error	LVGL drivers configration error.
+#endif
+
+#ifdef	RUNS_ON_WAYLAND
 #include	"lvgl/lv_drivers/wayland/wayland.h"
+#else
+#include	"lvgl/lv_drivers/display/fbdev.h"
+#include	"lvgl/lv_drivers/indev/evdev.h"
+#endif	/* RUNS_ON_WAYLAND */
 
 #include	"../include/benchmark_demo_gui_text.h"
 
@@ -425,6 +440,20 @@ typedef struct {
 #define	LB_BENCHMARK_TMPRESULT_FILE	"rz_bench_XXXXXX"
 #define	LB_BENCHMARK_TMPRESULT_PATH	"/tmp/rz_bench_XXXXXX"
 
+#ifndef RUNS_ON_WAYLAND /* Runs with FBDEV and EVDEV */
+typedef struct {
+	lv_coord_t width;
+	lv_coord_t height;
+	bool end;
+	lv_color_t *buff;
+	lv_disp_draw_buf_t draw_buf;
+	lv_disp_drv_t drv;
+	lv_disp_t *disp;
+	lv_indev_drv_t indev_drv;
+	lv_indev_t *mouse_indev;
+} lb_disp_fbevdev_t;
+#endif
+
 typedef enum {
 	GUI_SHUTDOWN_TYPE_QUIT = 0,
 	GUI_SHUTDOWN_TYPE_POWEROFF,
@@ -435,7 +464,7 @@ typedef enum {
 typedef struct {
 	lv_coord_t width;
 	lv_coord_t height;
-	lv_disp_t *disp;
+	void *disp;
 	lb_gui_shutdown_type_t shutdown_type;
 
 	lb_gui_screen_t screen_info;
@@ -445,7 +474,7 @@ typedef struct {
 } lb_gui_demo_t;
 
 
-int32_t lb_demo_gui(int32_t width, int32_t height, lv_disp_t *disp, char *cfg_path);
+int32_t lb_demo_gui(int32_t width, int32_t height, void *disp, char *cfg_path);
 void lb_demo_quit(void);
 lb_gui_shutdown_type_t lb_demo_get_shutdown_type(void);
 

@@ -252,7 +252,12 @@ static void msgbox_event_cb(lv_event_t *e)
 	default:
 		break;
 	}
-	lv_wayland_close_window(gui->disp);
+#ifdef RUNS_ON_WAYLAND
+	lv_wayland_close_window((lv_disp_t *)gui->disp);
+#else /* FBDEV and EVDEV  */
+	lb_disp_fbevdev_t *dispinf = (lb_disp_fbevdev_t *)gui->disp;
+	dispinf->end = true;
+#endif
 }
 
 /** Create a modal window for shutdown
@@ -449,7 +454,7 @@ static lb_gui_demo_t *gui_obj = NULL;	/* Linux Benchmark GUI demo base object */
  *
  * Basic objects for each screen are created, and data structures are allocated.
  */
-int32_t lb_demo_gui(int32_t width, int32_t height, lv_disp_t *disp, char *cfg_path)
+int32_t lb_demo_gui(int32_t width, int32_t height, void *disp, char *cfg_path)
 {
 	int32_t ret;
 
