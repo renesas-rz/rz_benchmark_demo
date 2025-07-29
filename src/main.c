@@ -1,7 +1,7 @@
 /**
  * RZ Linux Benchmark Demo
  *
- * Copyright (C) 2024 Renesas Electronics Corp. All rights reserved.
+ * Copyright (C) 2024, 2025 Renesas Electronics Corp. All rights reserved.
  */
 
 
@@ -70,7 +70,8 @@ static void check_options(int argc, char *argv[], char **cfg, char **input)
 		case 'v':
 			printf("RZ Linux Benchmark Demo, "
 				"Ver. %d.%02d\n" \
-				"Copyright (C) 2024 Renesas Electronics Corp. "
+				"Copyright (C) 2024, 2025 "
+				"Renesas Electronics Corp. "
 				"All rights reserved.\n",
 				LB_MAJOR_VERSION, LB_MINOR_VERSION);
 			exit(EXIT_SUCCESS);

@@ -1,7 +1,7 @@
 /**
  * RZ Linux Benchmark Demo
  *
- * Copyright (C) 2024 Renesas Electronics Corp. All rights reserved.
+ * Copyright (C) 2024, 2025 Renesas Electronics Corp. All rights reserved.
  */
 
 #ifndef	BENCHMARK_DEMO_GUI_H
@@ -428,7 +428,7 @@ typedef struct {
  * Declarations and definition for GUI demo
  *****************************************************************************/
 #define	LB_MAJOR_VERSION		(1)	/* Major number 0 ~ 9999999 */
-#define	LB_MINOR_VERSION		(1)	/* Minor number 0 ~ 99 */
+#define	LB_MINOR_VERSION		(2)	/* Minor number 0 ~ 99 */
 
 #if LB_MAJOR_VERSION > 9999999
 	#error	"LB_MAJOR_VERSION is too big."

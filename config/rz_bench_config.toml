@@ -102,7 +102,7 @@
 #			When the type is "dropdown", the value shall be
 #			contained in 'values_list'.
 
-version = "v1.01.000"
+version = "v1.02.000"
 log_path = "/home/root"
 
 [[benchmarks]]
