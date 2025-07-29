@@ -1,7 +1,7 @@
 /**
  * RZ Linux Benchmark Demo
  *
- * Copyright (C) 2024 Renesas Electronics Corp. All rights reserved.
+ * Copyright (C) 2024,2025 Renesas Electronics Corp. All rights reserved.
  */
 
 #include	<stdio.h>
@@ -21,7 +21,7 @@
 
 
 	/** A command used to get display informaiton */
-#define		GET_DISP_INFO		"modetest -M rcar-du -p"
+#define		GET_DISP_INFO		"modetest -M rzg2l-du -p"
 	/** A string to be searched */
 #define		STR_SEARCHED_FOR_DISP	"driver"
 	/** Maximum length of a line */
